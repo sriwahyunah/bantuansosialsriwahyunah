@@ -125,6 +125,38 @@ Route::prefix('admin')->middleware('auth', 'admin')->group(function () {
     Route::post('/admin/event', [EventController::class, 'store']);
     Route::put('/admin/event/{id}', [EventController::class, 'update']);
     Route::delete('/admin/event/{id}', [EventController::class, 'destroy']);
+     Route::get(
+        '/event/create',
+        [EventBantuanController::class, 'create']
+    )->name('admin.event.create');
+
+    Route::post(
+        '/event',
+        [EventBantuanController::class, 'store']
+    )->name('admin.event.store');
+
+    Route::get(
+        '/event/{id}',
+        [EventBantuanController::class, 'show']
+    )->name('admin.event.show');
+
+    Route::get(
+        '/event/{id}/edit',
+        [EventBantuanController::class, 'edit']
+    )->name('admin.event.edit');
+
+    Route::put(
+        '/event/{id}',
+        [EventBantuanController::class, 'update']
+    )->name('admin.event.update');
+
+    Route::delete(
+        '/event/{id}',
+        [EventBantuanController::class, 'destroy']
+    )->name('admin.event.destroy');
+
+
+    
 
     /*
     |--------------------------------------------------------------------------

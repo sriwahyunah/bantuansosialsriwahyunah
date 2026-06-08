@@ -4,6 +4,23 @@
 
 <div class="container-fluid">
 
+    {{-- ALERT SUCCESS --}}
+    @if(session('success'))
+
+        <div class="alert alert-success alert-dismissible fade show">
+
+            {{ session('success') }}
+
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+            </button>
+
+        </div>
+
+    @endif
+
     {{-- HEADER --}}
     <div class="mb-4">
 
@@ -37,10 +54,11 @@
 
                 </div>
 
-                <a href="#"
+                <a
+                    href="{{ route('admin.event.create') }}"
                     class="btn btn-primary rounded-3">
 
-                    <i class="fa fa-plus"></i>
+                    <i class="fas fa-plus"></i>
 
                     Tambah Event
 
@@ -57,153 +75,224 @@
 
                 <table class="table table-hover align-middle">
 
-                    {{-- TABLE HEAD --}}
                     <thead class="table-light">
 
                         <tr>
 
-                            <th>No</th>
+                            <th width="50">
+                                No
+                            </th>
 
-                            <th>Foto</th>
+                            <th width="120">
+                                Foto
+                            </th>
 
-                            <th>Nama Event</th>
+                            <th>
+                                Nama Event
+                            </th>
 
-                            <th>Tanggal Event</th>
+                            <th width="150">
+                                Tanggal Event
+                            </th>
 
-                            <th>Lokasi</th>
+                            <th width="200">
+                                Lokasi
+                            </th>
 
-                            <th>Deskripsi</th>
+                            <th>
+                                Deskripsi
+                            </th>
 
-                            <th>Status</th>
+                            <th width="120">
+                                Status
+                            </th>
 
-                            <th>Dibuat</th>
+                            <th width="120">
+                                Dibuat
+                            </th>
+
+                            <th width="180">
+                                Aksi
+                            </th>
 
                         </tr>
 
                     </thead>
 
-                    {{-- TABLE BODY --}}
                     <tbody>
 
                         @forelse($events as $event)
 
-                        <tr>
+                            <tr>
 
-                            {{-- NO --}}
-                            <td>
-                                {{ $loop->iteration }}
-                            </td>
+                                {{-- NO --}}
+                                <td>
 
-                            {{-- FOTO --}}
-                            <td>
+                                    {{ $loop->iteration }}
 
-                                @if($event->foto)
+                                </td>
 
-                                <img
-                                    src="{{ asset('storage/' . $event->foto) }}"
-                                    width="90"
-                                    height="60"
-                                    class="rounded shadow-sm"
-                                    style="object-fit:cover;">
+                                {{-- FOTO --}}
+                                <td>
 
-                                @else
+                                    @if($event->foto)
 
-                                <span class="badge bg-secondary">
+                                        <img
+                                            src="{{ asset('storage/'.$event->foto) }}"
+                                            width="90"
+                                            height="70"
+                                            class="rounded shadow-sm"
+                                            style="object-fit:cover;">
 
-                                    Tidak Ada Foto
+                                    @else
 
-                                </span>
+                                        <span class="badge bg-secondary">
 
-                                @endif
+                                            Tidak Ada Foto
 
-                            </td>
+                                        </span>
 
-                            {{-- NAMA EVENT --}}
-                            <td>
+                                    @endif
 
-                                <div class="fw-semibold">
+                                </td>
 
-                                    {{ $event->nama_event }}
+                                {{-- NAMA --}}
+                                <td>
 
-                                </div>
+                                    <strong>
 
-                            </td>
+                                        {{ $event->nama_event }}
 
-                            {{-- TANGGAL --}}
-                            <td>
+                                    </strong>
 
-                                {{ \Carbon\Carbon::parse($event->tanggal_event)->format('d M Y') }}
+                                </td>
 
-                            </td>
+                                {{-- TANGGAL --}}
+                                <td>
 
-                            {{-- LOKASI --}}
-                            <td>
+                                    {{ \Carbon\Carbon::parse($event->tanggal_event)->format('d M Y') }}
 
-                                <span class="text-dark">
+                                </td>
+
+                                {{-- LOKASI --}}
+                                <td>
 
                                     {{ $event->lokasi }}
 
-                                </span>
+                                </td>
 
-                            </td>
+                                {{-- DESKRIPSI --}}
+                                <td>
 
-                            {{-- DESKRIPSI --}}
-                            <td style="max-width:250px;">
+                                    {{ Str::limit($event->deskripsi,80) }}
 
-                                {{ $event->deskripsi }}
+                                </td>
 
-                            </td>
+                                {{-- STATUS --}}
+                                <td>
 
-                            {{-- STATUS --}}
-                            <td>
+                                    @if($event->status == 'Aktif')
 
-                                @if($event->status == 'Aktif')
+                                        <span class="badge bg-success">
 
-                                <span class="badge bg-success">
+                                            Aktif
 
-                                    Aktif
+                                        </span>
 
-                                </span>
+                                    @else
 
-                                @else
+                                        <span class="badge bg-danger">
 
-                                <span class="badge bg-danger">
+                                            Tidak Aktif
 
-                                    Tidak Aktif
+                                        </span>
 
-                                </span>
+                                    @endif
 
-                                @endif
+                                </td>
 
-                            </td>
+                                {{-- CREATED --}}
+                                <td>
 
-                            {{-- CREATED --}}
-                            <td>
+                                    {{ $event->created_at->format('d M Y') }}
 
-                                {{ $event->created_at->format('d M Y') }}
+                                </td>
 
-                            </td>
+                                {{-- AKSI --}}
+                                <td>
 
-                        </tr>
+                                    {{-- DETAIL --}}
+                                    <a
+                                        href="{{ route('admin.event.show',$event->id) }}"
+                                        class="btn btn-info btn-sm">
+
+                                        <i class="fas fa-eye"></i>
+
+                                    </a>
+
+                                    {{-- EDIT --}}
+                                    <a
+                                        href="{{ route('admin.event.edit',$event->id) }}"
+                                        class="btn btn-warning btn-sm">
+
+                                        <i class="fas fa-edit"></i>
+
+                                    </a>
+
+                                    {{-- DELETE --}}
+                                    <form
+                                        action="{{ route('admin.event.destroy',$event->id) }}"
+                                        method="POST"
+                                        class="d-inline">
+
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Yakin ingin menghapus event ini ?')">
+
+                                            <i class="fas fa-trash"></i>
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
 
                         @empty
 
-                        <tr>
+                            <tr>
 
-                            <td colspan="8"
-                                class="text-center">
+                                <td
+                                    colspan="9"
+                                    class="text-center py-4">
 
-                                Tidak ada data event bantuan
+                                    <div class="text-muted">
 
-                            </td>
+                                        Belum ada data event bantuan
 
-                        </tr>
+                                    </div>
+
+                                </td>
+
+                            </tr>
 
                         @endforelse
 
                     </tbody>
 
                 </table>
+
+            </div>
+
+            {{-- PAGINATION --}}
+            <div class="mt-3">
+
+                {{ $events->links() }}
 
             </div>
 

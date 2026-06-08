@@ -6,10 +6,10 @@
 
     <div class="card shadow border-0 rounded-4">
 
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-warning">
 
             <h4 class="mb-0">
-                Tambah Event Bantuan
+                Edit Event Bantuan
             </h4>
 
         </div>
@@ -17,11 +17,12 @@
         <div class="card-body">
 
             <form
-                action="{{ route('admin.event.store') }}"
+                action="{{ route('admin.event.update',$event->id) }}"
                 method="POST"
                 enctype="multipart/form-data">
 
                 @csrf
+                @method('PUT')
 
                 <div class="mb-3">
 
@@ -33,6 +34,7 @@
                         type="text"
                         name="nama_event"
                         class="form-control"
+                        value="{{ $event->nama_event }}"
                         required>
 
                 </div>
@@ -47,6 +49,7 @@
                         type="date"
                         name="tanggal_event"
                         class="form-control"
+                        value="{{ $event->tanggal_event }}"
                         required>
 
                 </div>
@@ -61,6 +64,7 @@
                         type="text"
                         name="lokasi"
                         class="form-control"
+                        value="{{ $event->lokasi }}"
                         required>
 
                 </div>
@@ -75,7 +79,7 @@
                         name="deskripsi"
                         rows="4"
                         class="form-control"
-                        required></textarea>
+                        required>{{ $event->deskripsi }}</textarea>
 
                 </div>
 
@@ -92,6 +96,19 @@
 
                 </div>
 
+                @if($event->foto)
+
+                <div class="mb-3">
+
+                    <img
+                        src="{{ asset('storage/'.$event->foto) }}"
+                        width="250"
+                        class="img-thumbnail">
+
+                </div>
+
+                @endif
+
                 <div class="mb-3">
 
                     <label class="form-label">
@@ -102,12 +119,20 @@
                         name="status"
                         class="form-select">
 
-                        <option value="Aktif">
+                        <option
+                            value="Aktif"
+                            {{ $event->status == 'Aktif' ? 'selected' : '' }}>
+
                             Aktif
+
                         </option>
 
-                        <option value="Tidak Aktif">
+                        <option
+                            value="Tidak Aktif"
+                            {{ $event->status == 'Tidak Aktif' ? 'selected' : '' }}>
+
                             Tidak Aktif
+
                         </option>
 
                     </select>
@@ -115,9 +140,9 @@
                 </div>
 
                 <button
-                    class="btn btn-success">
+                    class="btn btn-warning">
 
-                    Simpan Event
+                    Update Event
 
                 </button>
 

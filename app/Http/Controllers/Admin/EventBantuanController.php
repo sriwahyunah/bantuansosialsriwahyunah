@@ -3,67 +3,124 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\EventBantuan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Models\EventBantuan; // SESUAIKAN DENGAN MODEL KAMU
 
 class EventBantuanController extends Controller
 {
     public function index()
     {
-        $events = EventBantuan::latest()->get();
-        return view('admin.event.index', compact('events'));
+        $events = EventBantuan::latest()
+            ->paginate(10);
+
+        return view(
+            'admin.event.index',
+            compact('events')
+        );
+    }
+
+    public function create()
+    {
+        return view('admin.event.create');
     }
 
     public function store(Request $request)
     {
         $request->validate([
+
             'nama_event' => 'required',
-            'foto' => 'image|mimes:jpg,png,jpeg|max:2048'
+            'tanggal_event' => 'required',
+            'lokasi' => 'required',
+            'deskripsi' => 'required',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
         ]);
 
-        $fotoPath = null;
+        $foto = null;
 
         if ($request->hasFile('foto')) {
-            $fotoPath = $request->file('foto')->store('event', 'public');
+
+            $foto = $request
+                ->file('foto')
+                ->store('event', 'public');
         }
 
         EventBantuan::create([
+
             'nama_event' => $request->nama_event,
             'tanggal_event' => $request->tanggal_event,
             'lokasi' => $request->lokasi,
             'deskripsi' => $request->deskripsi,
-            'foto' => $fotoPath,
-            'status' => $request->status ?? 'Tidak Aktif',
+            'foto' => $foto,
+            'status' => $request->status,
+
         ]);
 
-        return redirect()->back()->with('success', 'Event berhasil ditambahkan');
+        return redirect()
+            ->route('admin.event.index')
+            ->with(
+                'success',
+                'Event berhasil ditambahkan'
+            );
+    }
+
+    public function show($id)
+    {
+        $event = EventBantuan::findOrFail($id);
+
+        return view(
+            'admin.event.show',
+            compact('event')
+        );
+    }
+
+    public function edit($id)
+    {
+        $event = EventBantuan::findOrFail($id);
+
+        return view(
+            'admin.event.edit',
+            compact('event')
+        );
     }
 
     public function update(Request $request, $id)
     {
         $event = EventBantuan::findOrFail($id);
 
-        $fotoPath = $event->foto;
+        $foto = $event->foto;
 
         if ($request->hasFile('foto')) {
+
             if ($event->foto) {
-                Storage::disk('public')->delete($event->foto);
+
+                Storage::disk('public')
+                    ->delete($event->foto);
             }
 
-            $fotoPath = $request->file('foto')->store('event', 'public');
+            $foto = $request
+                ->file('foto')
+                ->store('event', 'public');
         }
 
         $event->update([
+
             'nama_event' => $request->nama_event,
             'tanggal_event' => $request->tanggal_event,
             'lokasi' => $request->lokasi,
             'deskripsi' => $request->deskripsi,
-            'foto' => $fotoPath,
+            'foto' => $foto,
             'status' => $request->status,
+
         ]);
 
-        return redirect()->back()->with('success', 'Event berhasil diupdate');
+        return redirect()
+            ->route('admin.event.index')
+            ->with(
+                'success',
+                'Event berhasil diperbarui'
+            );
     }
 
     public function destroy($id)
@@ -71,11 +128,18 @@ class EventBantuanController extends Controller
         $event = EventBantuan::findOrFail($id);
 
         if ($event->foto) {
-            Storage::disk('public')->delete($event->foto);
+
+            Storage::disk('public')
+                ->delete($event->foto);
         }
 
         $event->delete();
 
-        return redirect()->back()->with('success', 'Event berhasil dihapus');
+        return redirect()
+            ->route('admin.event.index')
+            ->with(
+                'success',
+                'Event berhasil dihapus'
+            );
     }
 }
